@@ -1,0 +1,110 @@
+main:
+	#create stack
+	addi	sp,sp,-48
+	#save s0
+	sw	s0,44(sp)
+	#update s0
+	addi	s0,sp,48
+
+	#init arr[] to memory
+	li	x5,3
+	sw	x5,-48(s0)
+	li	x5,5
+	sw	x5,-44(s0)
+	li	x5,1
+	sw	x5,-40(s0)
+	li	x5,2
+	sw	x5,-36(s0)
+	li	x5,4
+	sw	x5,-32(s0)
+
+	#init i to memory
+	sw	zero,-20(s0)
+	j	.L2
+L6:
+	#init j to memory
+	sw	zero,-24(s0)
+	j	.L3
+.L5:
+	#load arr[ j ] to a4
+	lw	x5,-24(s0)
+	slli	x5,x5,2
+	addi	x4,s0,-16
+	add	x5,x4,x5
+	lw	x4,-32(x5)
+
+	#load arr[j+1] x5
+	lw	x5,-24(s0)
+	addi	x5,x5,1
+	slli	x5,x5,2
+	addi	x3,s0,-16
+	add	x5,x3,x5
+	lw	x5,-32(x5)
+	
+	#if arr[j + 1] > arr[j] 
+	bge	x5,x4,.L4
+
+# arr[j+1] < arr[j]
+
+	#load arr[j] x5
+	lw	x5,-24(s0)
+	slli	x5,x5,2
+	addi	x4,s0,-16
+	add	x5,x4,x5
+	lw	x5,-32(x5)
+
+	#store arr[j] to tmp
+	sw	x5,-28(s0)
+
+	#load arr[j+1] to a4
+	lw	x5,-24(s0)
+	addi	x5,x5,1
+	slli	x5,x5,2
+	addi	x4,s0,-16
+	add	x5,x4,x5
+	lw	x4,-32(x5)
+
+	#arr[j] = arr[j+1]
+	lw	x5,-24(s0)
+	slli	x5,x5,2
+	addi	x3,s0,-16
+	add	x5,x3,x5
+	sw	x4,-32(x5)
+
+	#store tmp to arr[j+1]
+	lw	x5,-24(s0)
+	addi	x5,x5,1
+	slli	x5,x5,2
+	addi	x4,s0,-16
+	add	x5,x4,x5
+	lw	x4,-28(s0)
+	sw	x4,-32(x5)
+.L4:
+	#j++
+	lw	x5,-24(s0)
+	addi	x5,x5,1
+	sw	x5,-24(s0)
+.L3:
+	#check (j - i) < 4
+	li	x4,4
+	lw	x5,-20(s0)
+	sub	x5,x4,x5
+	lw	x4,-24(s0)
+	blt	x4,x5,.L5
+
+	#i++
+	lw	x5,-20(s0)
+	addi	x5,x5,1
+	sw	x5,-20(s0)
+.L2:
+	#check i < 4
+	lw	x4,-20(s0)
+	li	x5,3
+	bge	x5,x4,.L6
+
+	#return
+	li	x5,0
+	mv	x0,x5
+	lw	s0,44(sp)
+	addi	sp,sp,48
+	jr	ra
