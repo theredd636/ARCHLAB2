@@ -7,26 +7,34 @@ main:
 	addi	s0,sp,48
 
 	#init arr[] to memory
-	li	x5,3
-	sw	x5,-48(s0)
 	li	x5,5
+	sw	x5,-48(s0)
+	li	x5,3
 	sw	x5,-44(s0)
-	li	x5,1
+	li	x5,6
 	sw	x5,-40(s0)
-	li	x5,2
+	li	x5,8
 	sw	x5,-36(s0)
-	li	x5,4
+	li	x5,9
 	sw	x5,-32(s0)
+    li  x5,1
+    sw  x5,-28(s0)
+    li  x5,4
+    sw  x5,-24(s0)
+    li  x5,7
+    sw  x5,-20(s0)
+    li  x5,2
+    sw  x5,-16(s0)
 
 	#init i to memory
 	sw	zero,-20(s0)
 	j	.L2
 L6:
 	#init j to memory
-	sw	zero,-24(s0)
+	sw	x0,-24(s0)
 	j	.L3
 .L5:
-	#load arr[ j ] to a4
+	#load arr[ j ] to x4
 	lw	x5,-24(s0)
 	slli	x5,x5,2
 	addi	x4,s0,-16
@@ -85,8 +93,8 @@ L6:
 	addi	x5,x5,1
 	sw	x5,-24(s0)
 .L3:
-	#check (j - i) < 4
-	li	x4,4
+	#check (j - i) < 9
+	li	x4,9
 	lw	x5,-20(s0)
 	sub	x5,x4,x5
 	lw	x4,-24(s0)
@@ -97,9 +105,9 @@ L6:
 	addi	x5,x5,1
 	sw	x5,-20(s0)
 .L2:
-	#check i < 4
+	#check i < 9
 	lw	x4,-20(s0)
-	li	x5,3
+	li	x5,9
 	bge	x5,x4,.L6
 
 	#return
