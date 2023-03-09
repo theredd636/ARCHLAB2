@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-
+#include "header.h"
 void parseFromFile(FILE* fp,char* inst,int* reg1){
     char temp[4];
     fscanf(fp,"%s",inst);
@@ -23,7 +21,7 @@ void parseRemainder(FILE* fp,char* inst,int* reg2,int* reg3,int* imm){
     int neg=0;
     int i=0;
     *reg3=0;
-    fscanf(fp,"%s",temp);
+    fscanf(fp,"%s\n",temp);
     if(strcmp(inst,"add")==0){
         if (temp[3]=='\0'){
             *reg2=(int)temp[1]-48;
@@ -137,51 +135,159 @@ void parseRemainder(FILE* fp,char* inst,int* reg2,int* reg3,int* imm){
         }
 
 }
-char *codeToHex(char* output,int rs1,int rs2,int rd,int immx){
-    int binary[32],rdx[5];
-    switch (output){
-        case "add":
-            binary[0]=1;
-            binary[1]=1;
-            binary[2]=0;
-            binary[3]=0;
-            binary[4]=1;
-            binary[5]=1;
-            binary[6]=0;
-            rd=decimalToBinaryReg(rd);
-            binary[7]=rdx[0];
-            binary[8]=rdx[1];
-            binary[9]=rdx[2];
-            binary[10]=rdx[3];
-            binary[11]=rdx[4];
-        break;
-
+void codeToHex(char* output,int rs1,int rs2,int rd,int immx,char hex[]){
+    for(int i=0;i<8;i++){
+        hex[i]='0';
+    }
+    int binary[32],rdx[5],r1[5],r2[5];
+    if (strcmp(output,"add")==0){
+        binary[0]=1;
+        binary[1]=1;
+        binary[2]=0;
+        binary[3]=0;
+        binary[4]=1;
+        binary[5]=1;
+        binary[6]=0;
+        decimalToBinaryReg(rd,rdx);
+        binary[7]=rdx[0];
+        binary[8]=rdx[1];
+        binary[9]=rdx[2];
+        binary[10]=rdx[3];
+        binary[11]=rdx[4];
+        binary[12]=0;
+        binary[13]=0; // func 3 hard coded
+        binary[14]=0;
+        decimalToBinaryReg(rs1,r1);
+        binary[15] = r1[0];
+        binary[16] = r1[1];
+        binary[17] = r1[2];
+        binary[18] = r1[3];
+        binary[19] = r1[4];
+        decimalToBinaryReg(rs2,r2);
+        binary[20] = r2[0];
+        binary[21] = r2[1];
+        binary[22] = r2[2];
+        binary[23] = r2[3];
+        binary[24] = r2[4];
+        binary[25] = 0;
+        binary[26] = 0;
+        binary[27] = 0;
+        binary[28] = 0; // func7 hard coded
+        binary[29] = 0;
+        binary[30] = 0;
+        binary[31] = 0;
+    }
+    if(output=="addi"){
+    }
+    for(int j=0;j<32;j++){
+        printf("%d",binary[31 - j]);
+    }
+    binaryToHex(binary,hex);
+    return hex;
+}
+void decimalToBinaryReg(int num,int binaryNum[]) {
+    unsigned int mask = 1U << (5-1);
+    int i;
+    for (i = 0; i < 5; i++) {
+        binaryNum[i] = (num & mask) ? 1 : 0;
+        num <<= 1;
     }
 }
-int* decimalToBinaryReg(int num) {   
-    if (num == 0) {
-        printf("0");
-        return;
+void binaryToHex(int binary[],char hex[]){
+    int temp[4];
+    temp[0] = 0;
+    temp[1] = 0;
+    temp[2] = 0;
+    temp[3] = 0;
+    int skip = 0;
+
+    for(int i = 0; i < 8 ; i++)
+    {
+        skip = (i * 4);
+        binary[31 - skip] = temp[3];
+        binary[30 - skip] = temp[2];
+        binary[29 - skip] = temp[1];
+        binary[28 - skip] = temp[0];
+
+        if((temp[0] == 0) & (temp[1] == 0) & (temp[2] == 0 ) & (temp[3] == 0))
+        {
+            hex[7- i] = 0;
+        }
+        if((temp[0] == 1) & (temp[1] == 0) & (temp[2] == 0 ) & (temp[3] == 0))
+        {
+            hex[7- i] = 1;
+        }
+        if((temp[0] == 0) & (temp[1] == 1) & (temp[2] == 0 ) & (temp[3] == 0))
+        {
+            hex[7- i] = 2;
+        }
+        if((temp[0] == 1) & (temp[1] == 1) & (temp[2] == 0 ) & (temp[3] == 0))
+        {
+            hex[7- i] = 3;
+        }
+        if((temp[0] == 0) & (temp[1] == 0) & (temp[2] == 1 ) & (temp[3] == 0))
+        {
+            hex[7- i] = 4;
+        }
+        if((temp[0] == 1) & (temp[1] == 0) & (temp[2] == 1 ) & (temp[3] == 0))
+        {
+            hex[7- i] = 5;
+        }
+        if((temp[0] == 0) & (temp[1] == 1) & (temp[2] == 1 ) & (temp[3] == 0))
+        {
+            hex[7- i] = 6;
+        }
+        if((temp[0] == 1) & (temp[1] == 1) & (temp[2] == 1 ) & (temp[3] == 0))
+        {
+            hex[7- i] = 7;
+        }
+        if((temp[0] == 0) & (temp[1] == 0) & (temp[2] == 0 ) & (temp[3] == 1))
+        {
+            hex[7- i] = 8;
+        }
+        if((temp[0] == 1) & (temp[1] == 0) & (temp[2] == 0 ) & (temp[3] == 1))
+        {
+            hex[7- i] = 9;
+        }
+        if((temp[0] == 0) & (temp[1] == 1) & (temp[2] == 0 ) & (temp[3] == 1))
+        {
+            hex[7- i] = 'a';
+        }
+        if((temp[0] == 1) & (temp[1] == 1) & (temp[2] == 0 ) & (temp[3] == 1))
+        {
+            hex[7- i] = 'b';
+        }
+        if((temp[0] == 0) & (temp[1] == 0) & (temp[2] == 1 ) & (temp[3] == 1))
+        {
+            hex[7- i] = 'c';
+        }
+        if((temp[0] == 1) & (temp[1] == 0) & (temp[2] == 1 ) & (temp[3] == 1))
+        {
+            hex[7- i] = 'd';
+        }
+        if((temp[0] == 0) & (temp[1] == 1) & (temp[2] == 1 ) & (temp[3] == 1))
+        {
+            hex[7- i] = 'e';
+        }
+        if((temp[0] == 1) & (temp[1] == 1) & (temp[2] == 1 ) & (temp[3] == 1))
+        {
+            hex[7- i] = 'f';
+        }
     }
-   int binaryNum[5]; // Assuming 32 bit integer.
-   int i=0;
-   for ( ;num > 0; ){
-      binaryNum[i++] = num % 2;
-      num /= 2;
-   }
-   return binaryNum;
+    return hex;
 }
 
 int main(){
     FILE* fp;
     fp=fopen("text.txt","r");
     //parseInstructionFromFile(fp);
-    char output[6];
+    char output[6],hex[8];
     int reg1,reg2,reg3,imm;
     int *reg1x=&reg1,*reg2x=&reg2,*reg3x=&reg3,*immx=&imm;
-    
     parseFromFile(fp,output,reg1x);
     parseRemainder(fp,output,reg2x,reg3x,immx);
     printf("%s %d %d %d\n",output,reg1,reg2,reg3);
+    codeToHex(output,reg1,reg2,reg3,imm,hex);
+    printf("%s\n",hex);
     return 0;
-}zero,
+}
