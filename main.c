@@ -208,10 +208,15 @@ void binaryToHex(int binary[],char hex[]){
     for(int i = 0; i < 8 ; i++)
     {
         skip = (i * 4);
-        binary[31 - skip] = temp[3];
-        binary[30 - skip] = temp[2];
-        binary[29 - skip] = temp[1];
-        binary[28 - skip] = temp[0];
+       // binary[31 - skip] = temp[3];
+       // binary[30 - skip] = temp[2];
+       // binary[29 - skip] = temp[1];
+       // binary[28 - skip] = temp[0];
+        
+        temp[3] = binary[31 - skip];
+        temp[2] = binary[30 - skip];  // I am stupid this should work
+        temp[1] = binary[29 - skip];
+        temp[0] = binary[28 - skip];
 
         if((temp[0] == 0) && (temp[1] == 0) && (temp[2] == 0 ) && (temp[3] == 0))
         {
