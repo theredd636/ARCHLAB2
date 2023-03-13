@@ -272,6 +272,12 @@ void binaryToHex(int binary[],char hex[]){
     temp[2] = 0;
     temp[3] = 0;
     int skip = 0;
+    int temp1[8];
+    for(int ok = 0; ok < 8; ok++)
+    {
+        temp1[ok] = 0;
+        printf("%c" , temp1[ok]);
+    }
     for(int will=0;will<32;will++){
         printf("%d",binary[31-will]);
     }
@@ -354,6 +360,17 @@ void binaryToHex(int binary[],char hex[]){
             hex[7- i] = 'f';
         }
     }
+    
+    for(int ali = 0; ali < 8 ; ali++)
+    {
+        temp1[ali] = hex[ali]; // just makes a temp string 
+    }
+    
+    for(int ali = 0; ali < 8 ; ali++)
+    {
+       hex[7 - ali] = temp1[ali];  // hex[7] = temp1[0] and so on just reverses the string
+    }
+    
     return hex;
 }
 
